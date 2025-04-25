@@ -2,14 +2,14 @@ FROM node:23-slim
 
 WORKDIR /usr/src/app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 
-RUN yarn
+RUN npm ci
 
 COPY . .
 
-RUN yarn run build
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["yarn", "run", "start"]
+CMD ["npm", "start"]
