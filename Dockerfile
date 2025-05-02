@@ -2,28 +2,25 @@ FROM node:23 AS build
 
 WORKDIR /usr/src/app
 
-RUN npm install -g pnpm
+COPY package.json yarn.lock ./
 
-COPY package.json pnpm-lock.yaml ./
-
-RUN pnpm install
+RUN yarn install
 
 COPY . .
 
-RUN pnpm run build
+RUN yarn build
 
-RUN pnpm prune --prod
+RUN yarn install --production
 
 FROM node:23.11.0-alpine3.21
 
 WORKDIR /usr/src/app
 
-RUN npm install -g pnpm
-
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/package.json ./package.json
+COPY --from=build /usr/src/app/yarn.lock ./yarn.lock
 COPY --from=build /usr/src/app/node_modules ./node_modules
 
 EXPOSE 3000
 
-CMD ["pnpm", "start:prod"]
+CMD ["yarn", "start:prod"]
